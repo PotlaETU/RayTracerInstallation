@@ -1,6 +1,6 @@
 package sae101.parser;
 
-import sae101.parser.scene.Scene;
+import sae101.triplet.Point;
 import sae101.triplet.Vector;
 
 /**
@@ -11,11 +11,11 @@ public class Camera {
     /**
      *
      */
-    private Vector lookFrom;
+    private final Point lookFrom;
 
-    private Vector lookAt;
+    private final Point lookAt;
 
-    private Vector up;
+    private final Vector up;
 
     private int fov;
 
@@ -27,7 +27,7 @@ public class Camera {
      * @param up       the up
      * @param fov      the fov
      */
-    public Camera(Vector lookFrom, Vector lookAt, Vector up, int fov) {
+    public Camera(Point lookFrom, Point lookAt, Vector up, int fov) {
         this.lookFrom = lookFrom;
         this.lookAt = lookAt;
         this.up = up;
@@ -58,7 +58,7 @@ public class Camera {
      *
      * @return the look from
      */
-    public Vector getLookFrom() {
+    public Point getLookFrom() {
         return lookFrom;
     }
 
@@ -68,7 +68,7 @@ public class Camera {
      *
      * @return the look at
      */
-    public Vector getLookAt() {
+    public Point getLookAt() {
         return lookAt;
     }
 

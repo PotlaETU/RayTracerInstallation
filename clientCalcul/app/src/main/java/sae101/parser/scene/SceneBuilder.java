@@ -13,16 +13,16 @@ import java.util.List;
  * The type Scene builder.
  */
 public class SceneBuilder implements Builder{
-    public File output;
+    private File output;
     private Camera camera;
 
     private int height;
 
     private int width;
 
-    private List<Light> lights= new ArrayList<>();
+    private final List<Light> lights= new ArrayList<>();
 
-    private List<SceneObjects> sceneObjs= new ArrayList<>();
+    private final List<SceneObjects> sceneObjs= new ArrayList<>();
 
     private Color ambient;
 
@@ -38,9 +38,22 @@ public class SceneBuilder implements Builder{
 
     private List<Color> colors;
 
+    private boolean shadow = false;
+
+    /**
+     * Set output.
+     *
+     * @param output the output
+     */
     public void setOutput(File output){
         this.output = output;
     }
+
+    /**
+     * Get output file.
+     *
+     * @return the file
+     */
     public File getOutput(){
         return output;
     }
@@ -55,6 +68,16 @@ public class SceneBuilder implements Builder{
         this.height=height;
         this.width=width;
     }
+
+    public boolean getShadow() {
+        return shadow;
+    }
+
+    public void setShadow(boolean shadow) {
+        this.shadow = shadow;
+    }
+
+
 
     /**
      * Sets ambient.
@@ -92,11 +115,21 @@ public class SceneBuilder implements Builder{
         this.shininess = shininess;
     }
 
+    /**
+     * Sets maxverts.
+     *
+     * @param maxverts the maxverts
+     */
     public void setMaxverts(int maxverts) {
         points = new ArrayList<>(getMaxverts());
         this.maxverts = maxverts;
     }
 
+    /**
+     * Gets maxverts.
+     *
+     * @return the maxverts
+     */
     public int getMaxverts() {
         return maxverts;
     }
@@ -137,6 +170,12 @@ public class SceneBuilder implements Builder{
         return ambient;
     }
 
+    /**
+     * Gets point.
+     *
+     * @param index the index
+     * @return the point
+     */
     public Point getPoint(int index) {
         return points.get(index);
     }
@@ -156,6 +195,11 @@ public class SceneBuilder implements Builder{
         lights.add(light);
     }
 
+    /**
+     * Add point.
+     *
+     * @param point the point
+     */
     public void addPoint(Point point){points.add(point);}
 
     @Override
@@ -165,6 +209,6 @@ public class SceneBuilder implements Builder{
 
     @Override
     public Scene build() {
-        return new Scene(camera,height,width,lights,sceneObjs,ambient, points, colors, output);
+        return new Scene(camera,height,width,lights,sceneObjs,ambient, points, colors, output, shadow);
     }
 }

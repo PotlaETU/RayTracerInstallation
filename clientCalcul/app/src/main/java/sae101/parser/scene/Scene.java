@@ -14,22 +14,24 @@ import java.util.List;
  * The type Scene.
  */
 public class Scene {
-    private File output;
-    private Camera camera;
+    private final File output;
+    private final Camera camera;
 
-    private int height;
+    private final int height;
 
-    private int width;
+    private final int width;
 
-    private List<Light> light;
+    private final List<Light> light;
 
-    private List<SceneObjects> sceneobj;
+    private final List<SceneObjects> sceneobj;
 
-    private List<Color> colors;
+    private final List<Color> colors;
 
-    private Color ambient;
+    private final Color ambient;
 
-    private List<Point> points;
+    private final List<Point> points;
+
+    private boolean shadow;
 
     /**
      * Instantiates a new Scene.
@@ -42,7 +44,7 @@ public class Scene {
      * @param ambient  the ambient
      * @param output
      */
-    public Scene(Camera camera, int height, int width, List<Light> light, List<SceneObjects> sceneobj, Color ambient, List<Point> points, List<Color> colors, File output) {
+    public Scene(Camera camera, int height, int width, List<Light> light, List<SceneObjects> sceneobj, Color ambient, List<Point> points, List<Color> colors, File output, boolean shadow) {
         this.camera = camera;
         this.height = height;
         this.width = width;
@@ -52,6 +54,7 @@ public class Scene {
         this.points = points;
         this.colors = colors;
         this.output = output;
+        this.shadow = shadow;
     }
 
     public File getOutput() {
@@ -123,9 +126,7 @@ public class Scene {
     public List<Sphere> getSphere(){
         List<Sphere> spheres = new ArrayList<>();
         for (SceneObjects objects:sceneobj){
-            if(objects instanceof Sphere){
-                spheres.add((Sphere) objects);
-            }
+            spheres.add((Sphere) objects);
         }
         return spheres;
     }
