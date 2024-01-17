@@ -18,12 +18,7 @@ public class SoumissionJob {
         String serverAddress = "localhost";
         int serverPort = 1410;
 
-        if (args.length != 1) {
-            System.out.println("syntax: java SoumissionJob <fichier source>");
-            return;
-        }
-
-        String sceneFilePath = args[0];
+        String sceneFilePath = "scenetd42.txt";
 
         try (SocketChannel socketChannel = SocketChannel.open()) {
             socketChannel.connect(new InetSocketAddress(serverAddress, serverPort));
