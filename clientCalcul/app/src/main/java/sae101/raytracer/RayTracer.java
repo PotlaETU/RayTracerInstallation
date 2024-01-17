@@ -125,7 +125,6 @@ public class RayTracer {
                 }
                 threads[i] = new RayTracerThread(this, startRow, endRow);
                 threads[i].start();
-                System.out.println(startRow + ":" + endRow);
             }
 
             for (Thread thread : threads) {
