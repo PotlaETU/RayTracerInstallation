@@ -17,15 +17,9 @@ public class ServerJob extends Thread implements Runnable{
     static Map<String, String> jobMap= new HashMap<>();
     private static final int port = 7007;
 
-
-    Socket s;
-
     SocketChannel socketChannel;
 
     public ServerJob(){}
-    public ServerJob(Socket s) {
-        this.s = s;
-    };
 
     public void run() {
 
