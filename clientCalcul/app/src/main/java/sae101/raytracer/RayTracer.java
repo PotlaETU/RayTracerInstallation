@@ -10,6 +10,7 @@ import sae101.triplet.Vector;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
@@ -111,7 +112,7 @@ public class RayTracer {
     /**
      * View.
      */
-    public void view() {
+    public byte[] view() {
         try {
             int nbThreads = Runtime.getRuntime().availableProcessors();
             Thread[] threads = new Thread[nbThreads];
@@ -130,10 +131,19 @@ public class RayTracer {
             for (Thread thread : threads) {
                 thread.join();
             }
-            ImageIO.write(img, "png", scene.getOutput());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            try {
+                ImageIO.write(img, "png", baos);
+                baos.flush();
+                return baos.toByteArray();
+            } finally {
+                baos.close();
+            }
         }
         catch (IOException e){
             System.err.println("Erreur lors de la création du fichier : "+e.getMessage());
+            return null;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
