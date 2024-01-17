@@ -9,9 +9,7 @@
 # local : 192.168.2.1
 # dmz : 10.0.2.1
 
-parametre=$1
-
-case $parametre in
+case $1 in
   routeur)
       echo "Configuration du routeur . . ."
       nmcli con mod local autoconnect true ipv4.method manual ipv4.addresses 192.168.2.1/24
