@@ -1,4 +1,4 @@
-package main.java.serveurJobs;
+package serveurJobs;
 
 import java.io.*;
 import java.net.*;
