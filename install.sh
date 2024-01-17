@@ -16,7 +16,6 @@ case $1 in
       nmcli con mod dmz autoconnect true ipv4.method manual ipv4.addresses 10.0.2.1/24
       nmcli con mod inet autoconnect true ipv4.method manual ipv4.addresses 1.2.3.4/24 ipv4.gateway
       net.ipv4.conf.all.forwarding=1
-      net.ipv6.conf.all.forwarding=1
       systemctl restart NetworkManager
   ;;
   serveur)
