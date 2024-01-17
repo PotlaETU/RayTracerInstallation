@@ -20,16 +20,16 @@ public class Parser {
      */
     public static SceneBuilder sceneBuilder = new SceneBuilder();
 
-    private final BufferedReader in;
+    private final String in;
 
     /**
      * Instantiates a new Parser.
      *
-     * @param path the path
+     * @param in the path
      * @throws FileNotFoundException the file not found exception
      */
-    public Parser(String path) throws FileNotFoundException {
-        this.in = new BufferedReader(new FileReader(path));
+    public Parser(String in) throws FileNotFoundException {
+        this.in = in;
     }
 
     /**
@@ -122,7 +122,6 @@ public class Parser {
             }
 
         });
-        in.close();
         return sceneBuilder.build();
     }
 
