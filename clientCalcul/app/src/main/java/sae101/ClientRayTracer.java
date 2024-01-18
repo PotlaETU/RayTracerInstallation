@@ -5,6 +5,7 @@ import sae101.parser.scene.Scene;
 import sae101.raytracer.RayTracer;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -17,19 +18,31 @@ public class ClientRayTracer {
 
     public static void main(String[] args) {
         try {
-            SocketChannel server = SocketChannel.open();
-            InetSocketAddress socketAddr = new InetSocketAddress("localhost", SERVER_PORT);
-            server.connect(socketAddr);
-
             while (true) {
+                SocketChannel server = SocketChannel.open();
+                InetSocketAddress socketAddr = new InetSocketAddress("localhost", SERVER_PORT);
+                try {
+                    server.connect(socketAddr);
+                }
+                catch (ConnectException e){
+                    System.err.println("Le serveur ne répond pas");
+                    System.out.println("Attente de 60 secondes...");
+                    Thread.sleep(60000);
+                }
+
                 sendMessage(server, "REQUESTJOB");
+                if("REQUESTJOB-ACK".equals(receiveMessage(server))){
+                    System.out.println("Demande de job bien reçu");
+                }
 
                 String response = receiveMessage(server);
 
-                if (response.equals("NOSCENE")) {
+                if (response.equals("REQUESTJOB-NOSCENE")) {
                     System.out.println("Aucun travail disponible. Attente de 60 secondes...");
                     Thread.sleep(60000);
-                } else if ("OK".equals(response)){
+                }
+                else if ("REQUESTJOB-OK".equals(response)){
+                    System.out.println("Image à générer.");
                     bbSize.clear();
                     server.read(bbSize);
                     bbSize.flip();
@@ -41,6 +54,7 @@ public class ClientRayTracer {
                     byte[] sceneData = dataBuffer.array();
                     dataBuffer.clear();
 
+                    System.out.println("Scène reçue.");
 
                     Parser parser = new Parser(new String(sceneData, StandardCharsets.UTF_8));
                     Scene scene = parser.build();
@@ -49,6 +63,10 @@ public class ClientRayTracer {
                     byte[] imageBinaryData = rayTracer.view();
 
                     sendMessage(server, "SAVEIMAGE");
+
+                    if("SAVEIMAGE-ACK".equals(receiveMessage(server))){
+                        System.out.println("Demande de sauvegarde d'image bien reçu");
+                    }
 
                     bbSize.putInt(imageBinaryData.length).flip();
                     server.write(bbSize);
@@ -59,6 +77,16 @@ public class ClientRayTracer {
                             .flip();
                     server.write(buffer);
                     buffer.clear();
+
+                    System.out.println("Image envoyé");
+
+                    if("SAVEIMAGE-OK".equals(receiveMessage(server))){
+                        System.out.println("Image bien enregistrée par le serveur.");
+                    }
+                    else{
+                        System.out.println("Erreur dans la reception de l'image");
+                    }
+                    System.out.println("Fin du job.");
                 }
             }
         } catch (IOException | InterruptedException e) {

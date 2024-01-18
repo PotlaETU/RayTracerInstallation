@@ -59,6 +59,8 @@ public class SoumissionJob {
 
         sendMessage(server,"ENQUEUEJOB");
 
+        System.out.println("Demande de job transmise.");
+
         bbSize.putInt(sceneBytes.length)
                 .flip();
 
@@ -68,16 +70,18 @@ public class SoumissionJob {
         ByteBuffer dataBuffer = ByteBuffer.wrap(sceneBytes);
         server.write(dataBuffer);
 
-        if("ACK".equals(receiveMessage(server))){
+        if("ENQUEUEJOB-ACK".equals(receiveMessage(server))){
             System.out.println("Le serveur a reçu la demande");
         }
 
-        if("OK".equals(receiveMessage(server))){
+        if("ENQUEUEJOB-OK".equals(receiveMessage(server))){
             System.out.println("Le serveur a enregistré la scène");
         }
         else{
             System.out.println("Le serveur n'a pas enregistré la scène");
         }
+
+        System.out.println("Fin du programme.");
 
         server.close();
     }

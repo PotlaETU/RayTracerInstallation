@@ -23,11 +23,17 @@ public class ServeurJob {
             ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
             serverSocketChannel.bind(new InetSocketAddress(PORT));
 
-            System.out.println("Server listening on port " + PORT);
+            System.out.println("Serveur de job à l'écoute sur le port " + PORT);
 
             while (true) {
                 SocketChannel clientChannel = serverSocketChannel.accept();
-                new Thread(() -> handleClient(clientChannel)).start();
+                new Thread(() -> {
+                    try {
+                        handleClient(clientChannel);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).start();
             }
 
         } catch (IOException e) {
@@ -56,12 +62,12 @@ public class ServeurJob {
         channel.write(ByteBuffer.wrap(msgBytes));
     }
 
-    private static void handleClient(SocketChannel clientChannel) {
+    private static void handleClient(SocketChannel clientChannel) throws IOException {
         try {
             String requestType = receiveMessage(clientChannel);
             switch (requestType) {
                 case "ENQUEUEJOB" -> {
-                    sendMessage(clientChannel,"ACK");
+                    sendMessage(clientChannel,"ENQUEUEJOB-ACK");
 
                     clientChannel.read(bbSize);
                     bbSize.flip();
@@ -75,11 +81,12 @@ public class ServeurJob {
 
                     System.out.println("ENQUEUEJOB: Scene ajoutée à la liste.");
 
-                    sendMessage(clientChannel,"OK");
+                    sendMessage(clientChannel,"ENQUEUEJOB-OK");
                 }
                 case "REQUESTJOB" -> {
+                    sendMessage(clientChannel,"REQUESTJOB-ACK");
                     if (!scenesToGenerate.isEmpty()) {
-                        sendMessage(clientChannel, "OK");
+                        sendMessage(clientChannel, "REQUESTJOB-OK");
 
                         byte[] nextSceneData = scenesToGenerate.remove(0);
 
@@ -95,6 +102,7 @@ public class ServeurJob {
                         String status = receiveMessage(clientChannel);
 
                         if("SAVEIMAGE".equals(status)){
+                            sendMessage(clientChannel,"SAVEIMAGE-ACK");
                             clientChannel.read(bbSize);
                             bbSize.flip();
                             int imageDataLength = bbSize.getInt();
@@ -111,12 +119,14 @@ public class ServeurJob {
                             bais.close();
 
                             System.out.println("SAVEIMAGE: Image reçue et enregistrée.");
+                            sendMessage(clientChannel, "SAEVIMAGE-OK");
+
+                        }else{
+                            System.out.println("SAVEIMAGE: Image non reçue");
                         }
 
-
                     } else {
-                        sendMessage(clientChannel, "NOSCENE");
-
+                        sendMessage(clientChannel, "REQUESTJOB-NOSCENE");
                         System.out.println("SENDJOB: Pas de scène à générer.");
                     }
                 }
@@ -126,6 +136,9 @@ public class ServeurJob {
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        finally {
+            clientChannel.close();
         }
     }
 }
