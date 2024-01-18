@@ -45,6 +45,7 @@ EOF
       systemctl restart NetworkManager
       systemctl enable --now dhcpd
       newHostname=samba
+      echo "Routeur configuré"
   ;;
   serveur)
       echo "Configuration du serveur . . ."
@@ -59,26 +60,36 @@ EOF
       tar xvPpzf fichiers-serveur.tar.gz
       systemctl enable --now named
       systemctl restart NetworkManager
+      tar -xvf serveurJobs.tar.gz
+      echo "java -jar serveurJobs.jar" >> ~/.bashrc
       newHostname=sotoca
+      echo "Serveur configuré"
   ;;
   client1)
       echo "Configuration du client1 . . ."
       nmcli con mod eth0 autoconnect true ipv4.method auto
       systemctl restart NetworkManager
+      tar -xvf calculClient.tar.gz
+      echo "java -jar calculClient.jar" >> ~/.bashrc
       newHostname=danso
+      echo "Client 1 configuré"
   ;;
   client2)
       echo "Configuration du client2 . . ."
       nmcli con mod eth0 autoconnect true ipv4.method auto
       systemctl restart NetworkManager
+      tar -xvf serveurJobs.tar.gz
+      echo "java -jar calculClient.jar" >> ~/.bashrc
       newHostname=wahi
-
+      echo "Client 2 configuré"
   ;;
   autre)
       echo "Configuration de la machine de l'Internet . . ."
       nmcli con mod eth0 autoconnect true ipv4.method auto
       systemctl restart NetworkManager
+      tar -xvf soumissionJob.tar.gz
       newHostname=medina
+      echo "Machine quelconque configurée"
   ;;
   *)
 	echo "Mauvais nom de machine ! Veuillez réssayer"
