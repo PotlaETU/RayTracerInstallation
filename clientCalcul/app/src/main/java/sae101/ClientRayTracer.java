@@ -15,6 +15,7 @@ public class ClientRayTracer {
 
     private static final ByteBuffer bbSize = ByteBuffer.allocate(4);
     private static final int SERVER_PORT = 5000;
+    private static final int CHUNK_SIZE = 1024;
 
     public static void main(String[] args) {
         try {
@@ -29,7 +30,6 @@ public class ClientRayTracer {
                     System.out.println("Attente de 60 secondes...");
                     Thread.sleep(60000);
                 }
-
                 sendMessage(server, "REQUESTJOB");
                 if("REQUESTJOB-ACK".equals(receiveMessage(server))){
                     System.out.println("Demande de job bien reçu par le serveur");
@@ -65,28 +65,37 @@ public class ClientRayTracer {
 
                     sendMessage(server, "SAVEIMAGE");
 
-                    if("SAVEIMAGE-ACK".equals(receiveMessage(server))){
-                        System.out.println("Demande de sauvegarde d'image bien reçu");
+                    if ("SAVEIMAGE-ACK".equals(receiveMessage(server))) {
+                        System.out.println("Demande de sauvegarde d'image bien reçue");
                     }
 
-                    bbSize.putInt(imageBinaryData.length).flip();
-                    server.write(bbSize);
-                    bbSize.clear();
+                    ByteBuffer imageSizeBuffer = ByteBuffer.allocate(4).putInt(imageBinaryData.length).flip();
+                    server.write(imageSizeBuffer);
 
-                    ByteBuffer buffer=ByteBuffer.allocate(imageBinaryData.length);
-                    buffer.put(imageBinaryData)
-                            .flip();
-                    server.write(buffer);
-                    buffer.clear();
+                    ByteBuffer buffer = ByteBuffer.allocate(1024);
 
-                    System.out.println("Image envoyé");
+                    int position = 0;
+                    while (position < imageBinaryData.length) {
+                        int remaining = imageBinaryData.length - position;
+                        int bytesToWrite = Math.min(remaining, buffer.capacity());
 
-                    if("SAVEIMAGE-OK".equals(receiveMessage(server))){
+                        buffer.put(imageBinaryData, position, bytesToWrite);
+                        buffer.flip();
+
+                        server.write(buffer);
+
+                        buffer.clear();
+                        position += bytesToWrite;
+                    }
+
+                    System.out.println("Image envoyée");
+
+                    if ("SAVEIMAGE-OK".equals(receiveMessage(server))) {
                         System.out.println("Image bien enregistrée par le serveur.");
+                    } else {
+                        System.out.println("Erreur dans la réception de l'image");
                     }
-                    else{
-                        System.out.println("Erreur dans la reception de l'image");
-                    }
+
                     System.out.println("Fin du job.");
                     server.close();
                     Thread.sleep(5000);

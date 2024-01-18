@@ -3,6 +3,7 @@ package serveurJobs;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -20,6 +21,9 @@ public class ServeurJob {
     private static final String scenesPath = "./rayTracer/scenes/";
 
     private static final ByteBuffer bbSize = ByteBuffer.allocate(4);
+
+    private static final int CHUNK_SIZE = 1024;
+
     private static final int PORT = 5000;
     private static final List<byte[]> scenesToGenerate = new ArrayList<>();
 
@@ -107,22 +111,35 @@ public class ServeurJob {
                         String status = receiveMessage(clientChannel);
 
                         if("SAVEIMAGE".equals(status)){
-                            sendMessage(clientChannel,"SAVEIMAGE-ACK");
-                            clientChannel.read(bbSize);
-                            bbSize.flip();
-                            int imageDataLength = bbSize.getInt();
-                            bbSize.clear();
+                            sendMessage(clientChannel, "SAVEIMAGE-ACK");
+                            System.out.println("SAVEIMAGE: Demande d'enregistrement d'image");
 
-                            ByteBuffer imageDataBuffer = ByteBuffer.allocate(imageDataLength);
-                            clientChannel.read(imageDataBuffer);
-                            imageDataBuffer.flip();
-                            imageDataBuffer.clear();
+                            ByteBuffer imageSizeBuffer = ByteBuffer.allocate(4);
+                            clientChannel.read(imageSizeBuffer);
+                            imageSizeBuffer.flip();
+                            int imageSize = imageSizeBuffer.getInt();
+                            imageSizeBuffer.clear();
 
-                            byte[] imageBytes = imageDataBuffer.array();
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+                            ByteBuffer buffer = ByteBuffer.allocate(1024);
+
+                            while (baos.size() < imageSize) {
+                                clientChannel.read(buffer);
+                                buffer.flip();
+                                byte[] bytes = new byte[buffer.remaining()];
+                                buffer.get(bytes);
+                                baos.write(bytes);
+                                buffer.clear();
+                            }
+
+                            byte[] imageBytes = baos.toByteArray();
                             ByteArrayInputStream bais = new ByteArrayInputStream(imageBytes);
-                            BufferedImage bi = ImageIO.read(bais);
-                            bais.close();
 
+                            BufferedImage bi = ImageIO.read(bais);
+
+                            bais.close();
+                            baos.close();
                             File imagesDirectory = new File(imagesPath);
 
                             if (!imagesDirectory.exists()) {
@@ -139,6 +156,7 @@ public class ServeurJob {
                             sendMessage(clientChannel, "SAVEIMAGE-OK");
 
                             clientChannel.close();
+
                         }else{
                             sendMessage(clientChannel,"SAVEIMAGE-ERROR");
                             System.out.println("SAVEIMAGE: Image non reçue");
@@ -146,7 +164,7 @@ public class ServeurJob {
 
                     } else {
                         sendMessage(clientChannel, "REQUESTJOB-NOSCENE");
-                        System.out.println("SENDJOB: Pas de scène à générer.");
+                        System.out.println("REQUESTJOB: Pas de scène à générer.");
                     }
                 }
 
