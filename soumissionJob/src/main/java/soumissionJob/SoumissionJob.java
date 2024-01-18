@@ -71,8 +71,21 @@ public class SoumissionJob {
         server.write(bbSize);
         bbSize.clear();
 
-        ByteBuffer dataBuffer = ByteBuffer.wrap(sceneBytes);
-        server.write(dataBuffer);
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
+
+        int position = 0;
+        while (position < sceneBytes.length) {
+            int remaining = sceneBytes.length - position;
+            int bytesToWrite = Math.min(remaining, buffer.capacity());
+
+            buffer.put(sceneBytes, position, bytesToWrite);
+            buffer.flip();
+
+            server.write(buffer);
+
+            buffer.clear();
+            position += bytesToWrite;
+        }
 
         if("ENQUEUEJOB-OK".equals(receiveMessage(server))){
             System.out.println("Le serveur a enregistré la scène");

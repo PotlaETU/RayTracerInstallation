@@ -83,10 +83,20 @@ public class ServeurJob {
                     int sceneDataLength = bbSize.getInt();
                     bbSize.clear();
 
-                    ByteBuffer dataBuffer = ByteBuffer.allocate(sceneDataLength);
-                    clientChannel.read(dataBuffer);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-                    scenesToGenerate.add(dataBuffer.array());
+                    ByteBuffer buffer = ByteBuffer.allocate(1024);
+
+                    while (baos.size() < sceneDataLength) {
+                        clientChannel.read(buffer);
+                        buffer.flip();
+                        byte[] bytes = new byte[buffer.remaining()];
+                        buffer.get(bytes);
+                        baos.write(bytes);
+                        buffer.clear();
+                    }
+
+                    scenesToGenerate.add(baos.toByteArray());
 
                     System.out.println("ENQUEUEJOB: Scene ajoutée à la liste.");
 
