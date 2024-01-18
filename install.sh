@@ -60,8 +60,8 @@ EOF
       tar xvPpzf fichiers-serveur.tar.gz
       systemctl enable --now named
       systemctl restart NetworkManager
-      tar -xvf serveurJobs.tar.gz
-      echo "java -jar serveurJobs.jar" >> ~/.bashrc
+      tar xvPpzf serveurJobs.tar.gz
+      echo "java -jar /usr/local/serveurJobs.jar &" >> ~/.bashrc
       newHostname=sotoca
       echo "Serveur configuré"
   ;;
@@ -69,8 +69,8 @@ EOF
       echo "Configuration du client1 . . ."
       nmcli con mod eth0 autoconnect true ipv4.method auto
       systemctl restart NetworkManager
-      tar -xvf calculClient.tar.gz
-      echo "java -jar calculClient.jar" >> ~/.bashrc
+      tar xvPpzf calculClient.tar.gz
+      echo "java -jar /usr/local/calculClient.jar &" >> ~/.bashrc
       newHostname=danso
       echo "Client 1 configuré"
   ;;
@@ -78,8 +78,8 @@ EOF
       echo "Configuration du client2 . . ."
       nmcli con mod eth0 autoconnect true ipv4.method auto
       systemctl restart NetworkManager
-      tar -xvf serveurJobs.tar.gz
-      echo "java -jar calculClient.jar" >> ~/.bashrc
+      tar xvPpzf serveurJobs.tar.gz
+      echo "java -jar /usr/local/calculClient.jar &" >> ~/.bashrc
       newHostname=wahi
       echo "Client 2 configuré"
   ;;
@@ -87,7 +87,7 @@ EOF
       echo "Configuration de la machine de l'Internet . . ."
       nmcli con mod eth0 autoconnect true ipv4.method auto
       systemctl restart NetworkManager
-      tar -xvf soumissionJob.tar.gz
+      tar xvPpzf soumissionJob.tar.gz
       newHostname=medina
       echo "Machine quelconque configurée"
   ;;
