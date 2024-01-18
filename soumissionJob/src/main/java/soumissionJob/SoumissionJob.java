@@ -1,6 +1,7 @@
 package soumissionJob;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -44,7 +45,14 @@ public class SoumissionJob {
 
         SocketChannel server = SocketChannel.open();
         SocketAddress socketAddr = new InetSocketAddress(serverAddress, serverPort);
-        server.connect(socketAddr);
+        try {
+            server.connect(socketAddr);
+        }
+        catch (ConnectException e){
+            System.out.println("Le serveur ne répond pas");
+            e.printStackTrace();
+            System.exit(1);
+        }
 
         Path path = Paths.get(sceneFilePath);
         byte[] sceneBytes = Files.readAllBytes(path);
@@ -60,8 +68,16 @@ public class SoumissionJob {
         ByteBuffer dataBuffer = ByteBuffer.wrap(sceneBytes);
         server.write(dataBuffer);
 
-        System.out.println(receiveMessage(server));
-        System.out.println(receiveMessage(server));
+        if("ACK".equals(receiveMessage(server))){
+            System.out.println("Le serveur a reçu la demande");
+        }
+
+        if("OK".equals(receiveMessage(server))){
+            System.out.println("Le serveur a enregistré la scène");
+        }
+        else{
+            System.out.println("Le serveur n'a pas enregistré la scène");
+        }
 
         server.close();
     }
