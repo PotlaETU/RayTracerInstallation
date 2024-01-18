@@ -1,53 +1,68 @@
 package soumissionJob;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class SoumissionJob {
 
-    public static void main(String[] args) {
-        String serverAddress = "localhost";
-        int serverPort = 1410;
+    private static final ByteBuffer bbSize = ByteBuffer.allocate(4);
 
+    private static void sendMessage(SocketChannel channel, String msg) throws IOException {
+        byte[] msgBytes = msg.getBytes(StandardCharsets.UTF_8);
+
+        bbSize.putInt(msgBytes.length)
+                .flip();
+        channel.write(bbSize);
+        bbSize.clear();
+        channel.write(ByteBuffer.wrap(msgBytes));
+    }
+
+    private static String receiveMessage(SocketChannel channel) throws IOException {
+        channel.read(bbSize);
+        bbSize.flip();
+        int typeSize = bbSize.getInt();
+        bbSize.clear();
+
+        ByteBuffer buffer = ByteBuffer.allocate(typeSize);
+        channel.read(buffer);
+        return new String(buffer.array(), StandardCharsets.UTF_8);
+    }
+
+    public static void main(String[] args) throws IOException {
+
+        String serverAddress = "localhost";
+        int serverPort = 5000;
         String sceneFilePath = "scenetd42.txt";
 
-        try (SocketChannel socketChannel = SocketChannel.open()) {
-            socketChannel.connect(new InetSocketAddress(serverAddress, serverPort));
+        SocketChannel server = SocketChannel.open();
+        SocketAddress socketAddr = new InetSocketAddress(serverAddress, serverPort);
+        server.connect(socketAddr);
 
-            Path path = Paths.get(sceneFilePath);
-            byte[] sceneBytes = Files.readAllBytes(path);
+        Path path = Paths.get(sceneFilePath);
+        byte[] sceneBytes = Files.readAllBytes(path);
 
-            ByteBuffer sizeBuffer = ByteBuffer.allocate(4);
-            sizeBuffer.putInt(sceneBytes.length);
-            sizeBuffer.flip();
-            socketChannel.write(sizeBuffer);
+        sendMessage(server,"ENQUEUEJOB");
 
-            ByteBuffer dataBuffer = ByteBuffer.wrap(sceneBytes);
-            socketChannel.write(dataBuffer);
+        bbSize.putInt(sceneBytes.length)
+                .flip();
 
-            ByteBuffer imageSizeBuffer = ByteBuffer.allocate(4);
-            socketChannel.read(imageSizeBuffer);
-            imageSizeBuffer.flip();
-            int imageSize = imageSizeBuffer.getInt();
+        server.write(bbSize);
+        bbSize.clear();
 
-            ByteBuffer imageBuffer = ByteBuffer.allocate(imageSize);
-            socketChannel.read(imageBuffer);
-            byte[] imageBytes = imageBuffer.array();
-            ByteArrayInputStream bais = new ByteArrayInputStream(imageBytes);
-            BufferedImage bi = ImageIO.read(bais);
-            ImageIO.write(bi, "png", new File("test.png"));
-            bais.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ByteBuffer dataBuffer = ByteBuffer.wrap(sceneBytes);
+        server.write(dataBuffer);
+
+        System.out.println(receiveMessage(server));
+        System.out.println(receiveMessage(server));
+
+        server.close();
     }
 }
