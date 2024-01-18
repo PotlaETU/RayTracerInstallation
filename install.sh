@@ -50,8 +50,8 @@ EOF
       echo "Configuration du serveur . . ."
       nmcli con mod eth0 autoconnect true ipv4.method auto
       iptables -F
-      iptables -A INPUT -p udp --sport 53 -j ACCEPT
-      iptables -A INPUT -p tcp --sport 53 -j ACCEPT
+      iptables -A INPUT -p udp --dport 53 -j ACCEPT
+      iptables -A INPUT -p tcp --dport 53 -j ACCEPT
       # J'ai choisi d'autoriser la connexion SSH depuis la machine autre vers le serveur (samba)
       iptables -A INPUT -s 1.2.3.5 -p tcp --dport 22 -j ACCEPT
       iptables -A INPUT -s 1.2.3.5 -p tcp --dport 22 -j LOG --log-prefix "conexion SSH : 1.2.3.5"
