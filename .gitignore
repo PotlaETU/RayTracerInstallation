@@ -35,4 +35,4 @@ bin/
 **/build/*
 !**/build/libs
 !**/build/libs/*.jar
-**/build/livs/app.jar
+**/build/libs/app.jar
