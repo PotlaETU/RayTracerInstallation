@@ -1,0 +1,39 @@
+// build.gradle
+
+plugins {
+    id 'java'
+}
+
+// Configurations communes
+subprojects {
+    apply plugin: 'java'
+
+    repositories {
+        jcenter()
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs 'src'
+            }
+        }
+    }
+
+    jar {
+        archiveBaseName = project.name
+        archiveVersion = project.version
+    }
+}
+
+project(':calculClient') {
+
+}
+
+project(':serveurJobs') {
+
+}
+
+project(':soumissionJob') {
+
+}
