@@ -4,6 +4,7 @@ import sae101.parser.Parser;
 import sae101.parser.scene.Scene;
 import sae101.raytracer.RayTracer;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
@@ -15,7 +16,6 @@ public class ClientRayTracer {
 
     private static final ByteBuffer bbSize = ByteBuffer.allocate(4);
     private static final int SERVER_PORT = 5000;
-    private static final int CHUNK_SIZE = 1024;
 
     public static void main(String[] args) {
         try {
@@ -44,20 +44,29 @@ public class ClientRayTracer {
                 }
                 else if ("REQUESTJOB-OK".equals(response)){
                     System.out.println("Image à générer.");
+
                     bbSize.clear();
                     server.read(bbSize);
                     bbSize.flip();
-                    int dataSize = bbSize.getInt();
+                    int sceneDataLength = bbSize.getInt();
                     bbSize.clear();
 
-                    ByteBuffer dataBuffer = ByteBuffer.allocate(dataSize);
-                    server.read(dataBuffer);
-                    byte[] sceneData = dataBuffer.array();
-                    dataBuffer.clear();
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+                    ByteBuffer buffer = ByteBuffer.allocate(1024);
+
+                    while (baos.size() < sceneDataLength) {
+                        server.read(buffer);
+                        buffer.flip();
+                        byte[] bytes = new byte[buffer.remaining()];
+                        buffer.get(bytes);
+                        baos.write(bytes);
+                        buffer.clear();
+                    }
 
                     System.out.println("Scène reçue.");
 
-                    Parser parser = new Parser(new String(sceneData, StandardCharsets.UTF_8));
+                    Parser parser = new Parser(baos.toString(StandardCharsets.UTF_8));
                     Scene scene = parser.build();
 
                     RayTracer rayTracer = new RayTracer(scene);
@@ -71,8 +80,6 @@ public class ClientRayTracer {
 
                     ByteBuffer imageSizeBuffer = ByteBuffer.allocate(4).putInt(imageBinaryData.length).flip();
                     server.write(imageSizeBuffer);
-
-                    ByteBuffer buffer = ByteBuffer.allocate(1024);
 
                     int position = 0;
                     while (position < imageBinaryData.length) {

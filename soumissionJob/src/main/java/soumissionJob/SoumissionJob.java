@@ -5,7 +5,6 @@ import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -15,16 +14,6 @@ import java.nio.file.Paths;
 public class SoumissionJob {
 
     private static final ByteBuffer bbSize = ByteBuffer.allocate(4);
-
-    private static void sendMessage(SocketChannel channel, String msg) throws IOException {
-        byte[] msgBytes = msg.getBytes(StandardCharsets.UTF_8);
-
-        bbSize.putInt(msgBytes.length)
-                .flip();
-        channel.write(bbSize);
-        bbSize.clear();
-        channel.write(ByteBuffer.wrap(msgBytes));
-    }
 
     private static String receiveMessage(SocketChannel channel) throws IOException {
         channel.read(bbSize);
@@ -57,7 +46,13 @@ public class SoumissionJob {
         Path path = Paths.get(sceneFilePath);
         byte[] sceneBytes = Files.readAllBytes(path);
 
-        sendMessage(server,"ENQUEUEJOB");
+        byte[] msgBytes = "ENQUEUEJOB".getBytes(StandardCharsets.UTF_8);
+
+        bbSize.putInt(msgBytes.length)
+                .flip();
+        server.write(bbSize);
+        bbSize.clear();
+        server.write(ByteBuffer.wrap(msgBytes));
 
         System.out.println("Demande de job transmise.");
 

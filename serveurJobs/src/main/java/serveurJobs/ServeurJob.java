@@ -17,12 +17,9 @@ import java.util.UUID;
 
 public class ServeurJob {
 
-    private static final String imagesPath = "./rayTracer/images/";
-    private static final String scenesPath = "./rayTracer/scenes/";
+    private static final String imagesPath = "/var/rayTracer/images/";
 
     private static final ByteBuffer bbSize = ByteBuffer.allocate(4);
-
-    private static final int CHUNK_SIZE = 1024;
 
     private static final int PORT = 5000;
     private static final List<byte[]> scenesToGenerate = new ArrayList<>();
