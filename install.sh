@@ -21,12 +21,25 @@ domaine=raytracing.fr
 case $1 in
   routeur)
       echo "Configuration du routeur . . ."
-      nmcli con mod local autoconnect true ipv4.method manual ipv4.addresses 192.168.2.1/24 ipv4.routes "192.168.2.0/24 192.168.2.1"
-      nmcli con mod dmz autoconnect true ipv4.method manual ipv4.addresses 10.0.2.1/24 ipv4.routes "10.0.2.0/24 10.0.2.1"
-      nmcli con mod inet autoconnect true ipv4.method manual ipv4.addresses 1.2.3.4/24
+      nmcli con mod local autoconnect true ipv4.method manual ipv4.addresses 192.168.2.1/24 ipv4.routes "10.0.2.0/24 10.0.2.1" ipv4.gateway 1.2.3.4
+      nmcli con mod dmz autoconnect true ipv4.method manual ipv4.addresses 10.0.2.1/24 ipv4.routes "192.168.2.0/24 192.168.2.1" ipv4.gateway 1.2.3.4
+      nmcli con mod inet autoconnect true ipv4.method manual ipv4.addresses 1.2.3.4/24 ipv4.routes "10.0.2.0/24 10.0.2.1 192.168.2.0/24 192.168.2.1"
       iptables -F
-      iptables -X
+      iptables -A INPUT -j REJECT
+      iptables -A OUTPUT -j REJECT
+      iptables -A INPUT -p udp --sport 53 -j ACCEPT
+      iptables -A INPUT -p tcp --sport 53 -j ACCEPT
+      iptables -A INPUT -s 192.168.2.0/24 -j ACCEPT
+      iptables -A INPUT -s 10.0.2.0/24 -j ACCEPT
+      iptables -A FORWARD -i dmz -o inet -j ACCEPT
+      # J'ai choisi d'autoriser la connexion SSH depuis la machine autre vers le serveur (samba)
+      iptables -A INPUT -s 1.2.3.5 -p tcp --dport 22 -j ACCEPT
+      iptables -A INPUT -s 1.2.3.5 -p tcp --dport 22 -j LOG --log-prefix "conexion SSH : 1.2.3.5"
+      iptables -A OUTPUT -s 192.168.2.0/24 -p tcp --dport 80 -j ACCEPT
+      iptables -A OUTPUT -s 192.168.2.0/24 -p tcp --dport 443 -j ACCEPT
+      iptables -A input
       iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE
+      iptables-save
       grep -q net.ipv4.conf.all.forwarding=1 /etc/sysctl.conf || cat <<EOF >> /etc/sysctl.conf
 net.ipv4.conf.all.forwarding=1
 EOF
