@@ -162,8 +162,6 @@ public class ServeurJob {
                             System.out.println("SAVEIMAGE: Image reçue et enregistrée.");
                             sendMessage(clientChannel, "SAVEIMAGE-OK");
 
-                            clientChannel.close();
-
                         }else{
                             sendMessage(clientChannel,"SAVEIMAGE-ERROR");
                             System.out.println("SAVEIMAGE: Image non reçue");
@@ -180,9 +178,6 @@ public class ServeurJob {
 
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        finally {
-            clientChannel.close();
         }
     }
 }
