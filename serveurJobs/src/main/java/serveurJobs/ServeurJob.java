@@ -12,8 +12,13 @@ import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ServeurJob {
+
+    private static final String imagesPath = "./rayTracer/images/";
+    private static final String scenesPath = "./rayTracer/scenes/";
+
     private static final ByteBuffer bbSize = ByteBuffer.allocate(4);
     private static final int PORT = 5000;
     private static final List<byte[]> scenesToGenerate = new ArrayList<>();
@@ -41,7 +46,7 @@ public class ServeurJob {
         }
     }
 
-    private static String receiveMessage(SocketChannel channel) throws IOException {
+    private static synchronized String receiveMessage(SocketChannel channel) throws IOException {
         channel.read(bbSize);
         bbSize.flip();
         int typeSize = bbSize.getInt();
@@ -52,7 +57,7 @@ public class ServeurJob {
         return new String(buffer.array(), StandardCharsets.UTF_8);
     }
 
-    private static void sendMessage(SocketChannel channel, String msg) throws IOException {
+    private static synchronized void sendMessage(SocketChannel channel, String msg) throws IOException {
         byte[] msgBytes = msg.getBytes(StandardCharsets.UTF_8);
 
         ByteBuffer bbSize = ByteBuffer.allocate(4)
@@ -111,17 +116,31 @@ public class ServeurJob {
                             ByteBuffer imageDataBuffer = ByteBuffer.allocate(imageDataLength);
                             clientChannel.read(imageDataBuffer);
                             imageDataBuffer.flip();
+                            imageDataBuffer.clear();
 
                             byte[] imageBytes = imageDataBuffer.array();
                             ByteArrayInputStream bais = new ByteArrayInputStream(imageBytes);
                             BufferedImage bi = ImageIO.read(bais);
-                            ImageIO.write(bi, "png", new File("test.png"));
                             bais.close();
 
-                            System.out.println("SAVEIMAGE: Image reçue et enregistrée.");
-                            sendMessage(clientChannel, "SAEVIMAGE-OK");
+                            File imagesDirectory = new File(imagesPath);
 
+                            if (!imagesDirectory.exists()) {
+                                if (imagesDirectory.mkdirs()) {
+                                    System.out.println("Répertoire créé avec succès !");
+                                } else {
+                                    System.err.println("Erreur lors de la création du répertoire.");
+                                }
+                            }
+                            ImageIO.write(bi, "png", new File(imagesPath + UUID.randomUUID() + ".png"));
+
+
+                            System.out.println("SAVEIMAGE: Image reçue et enregistrée.");
+                            sendMessage(clientChannel, "SAVEIMAGE-OK");
+
+                            clientChannel.close();
                         }else{
+                            sendMessage(clientChannel,"SAVEIMAGE-ERROR");
                             System.out.println("SAVEIMAGE: Image non reçue");
                         }
 

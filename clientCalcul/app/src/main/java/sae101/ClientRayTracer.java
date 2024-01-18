@@ -32,13 +32,14 @@ public class ClientRayTracer {
 
                 sendMessage(server, "REQUESTJOB");
                 if("REQUESTJOB-ACK".equals(receiveMessage(server))){
-                    System.out.println("Demande de job bien reçu");
+                    System.out.println("Demande de job bien reçu par le serveur");
                 }
 
                 String response = receiveMessage(server);
 
                 if (response.equals("REQUESTJOB-NOSCENE")) {
                     System.out.println("Aucun travail disponible. Attente de 60 secondes...");
+                    server.close();
                     Thread.sleep(60000);
                 }
                 else if ("REQUESTJOB-OK".equals(response)){
@@ -87,6 +88,8 @@ public class ClientRayTracer {
                         System.out.println("Erreur dans la reception de l'image");
                     }
                     System.out.println("Fin du job.");
+                    server.close();
+                    Thread.sleep(5000);
                 }
             }
         } catch (IOException | InterruptedException e) {
@@ -94,7 +97,7 @@ public class ClientRayTracer {
         }
     }
 
-    private static void sendMessage(SocketChannel channel, String msg) throws IOException {
+    private static synchronized void sendMessage(SocketChannel channel, String msg) throws IOException {
         byte[] msgBytes = msg.getBytes(StandardCharsets.UTF_8);
         ByteBuffer bbSize = ByteBuffer.allocate(4).putInt(msgBytes.length).flip();
         channel.write(bbSize);
@@ -102,7 +105,7 @@ public class ClientRayTracer {
         channel.write(ByteBuffer.wrap(msgBytes));
     }
 
-    private static String receiveMessage(SocketChannel channel) throws IOException {
+    private static synchronized String receiveMessage(SocketChannel channel) throws IOException {
         channel.read(bbSize);
         bbSize.flip();
         int dataSize = bbSize.getInt();

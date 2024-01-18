@@ -49,8 +49,8 @@ public class SoumissionJob {
             server.connect(socketAddr);
         }
         catch (ConnectException e){
-            System.out.println("Le serveur ne répond pas");
-            e.printStackTrace();
+            System.err.println("Le serveur ne répond pas.");
+            System.err.println("La scène n'a pas était soumise.");
             System.exit(1);
         }
 
@@ -61,6 +61,10 @@ public class SoumissionJob {
 
         System.out.println("Demande de job transmise.");
 
+        if("ENQUEUEJOB-ACK".equals(receiveMessage(server))){
+            System.out.println("Le serveur est prêt à recevoir la scène");
+        }
+
         bbSize.putInt(sceneBytes.length)
                 .flip();
 
@@ -69,10 +73,6 @@ public class SoumissionJob {
 
         ByteBuffer dataBuffer = ByteBuffer.wrap(sceneBytes);
         server.write(dataBuffer);
-
-        if("ENQUEUEJOB-ACK".equals(receiveMessage(server))){
-            System.out.println("Le serveur a reçu la demande");
-        }
 
         if("ENQUEUEJOB-OK".equals(receiveMessage(server))){
             System.out.println("Le serveur a enregistré la scène");
