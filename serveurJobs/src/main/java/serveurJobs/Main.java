@@ -1,4 +1,0 @@
-package serveurJobs;
-class Main{
-
-}
