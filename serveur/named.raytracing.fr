@@ -1,0 +1,16 @@
+$TTL 1H
+$ORIGIN raytracing.fr
+@ IN SOA sotoca.raytracing.fr. root.raytracing.fr. (1 6H 1H 1W 1H)
+@ IN NS sotoca
+
+sotoca IN A 10.0.2.2
+danso IN A 192.168.2.2
+wahi IN A 192.168.2.3
+samba IN A 10.0.2.1
+medina IN A 1.2.3.5
+
+routeur IN CNAME samaba
+serveur IN CNAME sotoca
+client1 IN CNAME danso
+client2 IN CNAME wahi
+autre IN CNAME medina
