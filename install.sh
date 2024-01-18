@@ -31,6 +31,8 @@ case $1 in
       iptables -A INPUT -s 20.0.5.1/24 -j ACCEPT
       iptables -A FORWARD -i dmz -o inet -j ACCEPT
       iptables -A FORWARD -i inet -o dmz -j ACCEPT
+      iptables -A FORWARD -i local -o dmz -j ACCEPT
+      iptables -A FORWARD -i dmz -o local -j ACCEPT
       iptables -A OUTPUT -s 192.168.2.0/24 -p tcp --dport 80 -j ACCEPT
       iptables -A OUTPUT -s 192.168.2.0/24 -p tcp --dport 443 -j ACCEPT
       iptables -A input
