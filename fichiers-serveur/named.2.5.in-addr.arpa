@@ -1,5 +1,5 @@
 $TTL 1H
-$ORIGIN 2.2.in-addr.arpa.
+$ORIGIN 2.5.in-addr.arpa.
 @ IN SOA sotoca.raytracing.fr. root.raytracing.fr. (1 6H 1H 1W 1H)
 
 @ IN NS sotoca.raytracing.fr.
