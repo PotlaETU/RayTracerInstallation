@@ -1,16 +1,13 @@
-// build.gradle
-
 plugins {
     id 'java'
 }
 
-// Configurations communes
-subprojects {
-    apply plugin: 'java'
-
+allprojects {
     repositories {
         jcenter()
     }
+
+    apply plugin: 'java'
 
     sourceSets {
         main {
@@ -21,19 +18,10 @@ subprojects {
     }
 
     jar {
-        archiveBaseName = project.name
-        archiveVersion = project.version
+        manifest {
+            attributes(
+                    'Main-Class': "${project.group}.${project.name}.Main"
+            )
+        }
     }
-}
-
-project(':calculClient') {
-
-}
-
-project(':serveurJobs') {
-
-}
-
-project(':soumissionJob') {
-
 }
