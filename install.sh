@@ -10,8 +10,8 @@
 # dmz : 10.0.2.1
 
 #nom des machines :
-#routeur : sotoca
-#serveur : samba
+#routeur : samba
+#serveur : sotoca
 #client1 : danso
 #client2 : wahi
 #autre : medina
@@ -21,19 +21,27 @@ domaine=raytracing.fr
 case $1 in
   routeur)
       echo "Configuration du routeur . . ."
-      nmcli con mod local autoconnect true ipv4.method manual ipv4.addresses 192.168.2.1/24
-      nmcli con mod dmz autoconnect true ipv4.method manual ipv4.addresses 10.0.2.1/24
-      nmcli con mod inet autoconnect true ipv4.method manual ipv4.addresses 1.2.3.4/24 ipv4.gateway
-      sysctl net.ipv4.conf.all.forwarding=1
+      nmcli con mod local autoconnect true ipv4.method manual ipv4.addresses 192.168.2.1/24 ipv4.routes "192.168.2.0/24 192.168.2.1"
+      nmcli con mod dmz autoconnect true ipv4.method manual ipv4.addresses 10.0.2.1/24 ipv4.routes "10.0.2.0/24 10.0.2.1"
+      nmcli con mod inet autoconnect true ipv4.method manual ipv4.addresses 1.2.3.4/24
+      iptables -F
+      iptables -X
+      iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE
+      grep -q net.ipv4.conf.all.forwarding=1 /etc/sysctl.conf || cat <<EOF >> /etc/sysctl.conf
+net.ipv4.conf.all.forwarding=1
+EOF
       tar xvPpzf fichiers-routeur.tar.gz
       systemctl restart NetworkManager
-      newHostname=sotoca
+      systemctl enable --now dhcpd
+      newHostname=samba
   ;;
   serveur)
       echo "Configuration du serveur . . ."
       nmcli con mod eth0 autoconnect true ipv4.method auto
+      tar xvPpzf fichiers-serveur.tar.gz
+      systemctl enable --now named
       systemctl restart NetworkManager
-      newHostname=samba
+      newHostname=sotoca
   ;;
   client1)
       echo "Configuration du client1 . . ."
