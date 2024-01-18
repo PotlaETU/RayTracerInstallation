@@ -30,7 +30,9 @@ public class SoumissionJob {
 
         if (args.length == 0){
             System.err.println("java -jar app.jar <fichier scene>");
+            System.exit(1);
         }
+
         String serverAddress = "localhost";
         int serverPort = 5000;
 
