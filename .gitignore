@@ -30,5 +30,7 @@ bin/
 ### Mac OS ###
 .DS_Store
 
+**/.gradle/
+
 **/build/*
 !**/build/libs/*.jar
