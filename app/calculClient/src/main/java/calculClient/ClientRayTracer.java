@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
@@ -20,8 +21,11 @@ public class ClientRayTracer {
     public static void main(String[] args) {
         try {
             while (true) {
+                String serverAddress = "sotoca.raytracer.fr";
+                int serverPort = 5000;
+
                 SocketChannel server = SocketChannel.open();
-                InetSocketAddress socketAddr = new InetSocketAddress("localhost", SERVER_PORT);
+                SocketAddress socketAddr = new InetSocketAddress(serverAddress, serverPort);
                 try {
                     server.connect(socketAddr);
                 }

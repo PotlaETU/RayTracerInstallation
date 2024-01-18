@@ -33,7 +33,7 @@ public class SoumissionJob {
             System.exit(1);
         }
 
-        String serverAddress = "localhost";
+        String serverAddress = "sotoca.raytracer.fr";
         int serverPort = 5000;
 
         SocketChannel server = SocketChannel.open();
