@@ -6,7 +6,9 @@ allprojects {
     repositories {
         jcenter()
     }
+}
 
+subprojects {
     apply plugin: 'java'
 
     sourceSets {
@@ -16,11 +18,33 @@ allprojects {
             }
         }
     }
+}
 
+project(':calculClient') {
     jar {
         manifest {
             attributes(
-                    'Main-Class': "${project.group}.${project.name}.Main"
+                    'Main-Class': 'calculClient.ClientRayTracer'
+            )
+        }
+    }
+}
+
+project(':serveurJobs') {
+    jar {
+        manifest {
+            attributes(
+                    'Main-Class': 'serveurJobs.ServeurJob'
+            )
+        }
+    }
+}
+
+project(':soumissionJob') {
+    jar {
+        manifest {
+            attributes(
+                    'Main-Class': 'soumissionJob.SoumissionJob'
             )
         }
     }
