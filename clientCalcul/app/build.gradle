@@ -27,7 +27,7 @@ dependencies {
 application {
     // Define the main class for the application.
     apply plugin: "java"
-    mainClass = 'sae101.Main'
+    mainClass = 'sae101.ClientRayTracer'
 
     run {
         if (project.hasProperty('inputFile')) {
@@ -38,7 +38,7 @@ application {
 jar {
     manifest {
         attributes(
-                'Main-Class': 'sae101.Main'
+                'Main-Class': 'sae101.ClientRayTracer'
         )
     }
 }
