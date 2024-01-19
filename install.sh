@@ -78,7 +78,7 @@ EOF
       echo "Configuration du client2 . . ."
       nmcli con mod eth0 autoconnect true ipv4.method auto
       systemctl restart NetworkManager
-      tar xvPpzf serveurJobs.tar.gz
+      tar xvPpzf calculClient.tar.gz
       echo "java -jar /usr/local/calculClient.jar &" >> ~/.bashrc
       newHostname=wahi
       echo "Client 2 configuré"
