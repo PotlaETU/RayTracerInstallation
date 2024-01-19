@@ -41,7 +41,7 @@ case $1 in
       grep -q net.ipv4.conf.all.forwarding=1 /etc/sysctl.conf || cat <<EOF >> /etc/sysctl.conf
 net.ipv4.conf.all.forwarding=1
 EOF
-      tar xvPpzf fichiers-routeur.tar.gz
+      tar xvPpzf archivesTAR/fichiers-routeur.tar.gz
       systemctl restart NetworkManager
       systemctl enable --now dhcpd
       newHostname=samba
@@ -57,10 +57,10 @@ EOF
       iptables -A INPUT -s 1.2.3.5 -p tcp --dport 22 -j ACCEPT
       iptables -A INPUT -s 1.2.3.5 -p tcp --dport 22 -j LOG --log-prefix "conexion SSH : 1.2.3.5"
       iptables-save > /etc/sysconfig/iptables
-      tar xvPpzf fichiers-serveur.tar.gz
+      tar xvPpzf archivesTAR/fichiers-serveur.tar.gz
       systemctl enable --now named
       systemctl restart NetworkManager
-      tar xvPpzf serveurJobs.tar.gz
+      tar xvPpzf archivesTAR/serveurJobs.tar.gz
       echo "java -jar /usr/local/serveurJobs.jar &" >> ~/.bashrc
       newHostname=sotoca
       echo "Serveur configuré"
@@ -69,7 +69,7 @@ EOF
       echo "Configuration du client1 . . ."
       nmcli con mod eth0 autoconnect true ipv4.method auto
       systemctl restart NetworkManager
-      tar xvPpzf calculClient.tar.gz
+      tar xvPpzf archivesTAR/calculClient.tar.gz
       echo "java -jar /usr/local/calculClient.jar &" >> ~/.bashrc
       newHostname=danso
       echo "Client 1 configuré"
@@ -78,7 +78,7 @@ EOF
       echo "Configuration du client2 . . ."
       nmcli con mod eth0 autoconnect true ipv4.method auto
       systemctl restart NetworkManager
-      tar xvPpzf calculClient.tar.gz
+      tar xvPpzf archivesTAR/calculClient.tar.gz
       echo "java -jar /usr/local/calculClient.jar &" >> ~/.bashrc
       newHostname=wahi
       echo "Client 2 configuré"
@@ -87,7 +87,7 @@ EOF
       echo "Configuration de la machine de l'Internet . . ."
       nmcli con mod eth0 autoconnect true ipv4.method auto
       systemctl restart NetworkManager
-      tar xvPpzf soumissionJob.tar.gz
+      tar xvPpzf archivesTAR/soumissionJob.tar.gz
       newHostname=medina
       echo "Machine quelconque configurée"
   ;;
