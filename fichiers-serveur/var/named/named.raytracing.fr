@@ -9,7 +9,7 @@ wahi IN A 192.168.2.3
 samba IN A 10.0.2.1
 medina IN A 1.2.3.5
 
-routeur IN CNAME samaba
+routeur IN CNAME samba
 serveur IN CNAME sotoca
 client1 IN CNAME danso
 client2 IN CNAME wahi
