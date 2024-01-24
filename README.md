@@ -1,5 +1,9 @@
 # Guide d'installation
 
+## Explications
+
+Le script `install.sh` permet d'installer le programme java `soumissionJob.jar` sur votre machine. Ce qui fait le lien avec le [RayTracer](https://github.com/PotlaETU/RayTracer).
+
 ## 1. Installation 
 
 Il faut cloner le projet sur votre machine avec la commande suivante :
@@ -39,3 +43,10 @@ Sinon, **au prochain démarrage de votre PC**, le programme java se lancera en a
 
 
 ### **Vous avez maintenant terminé l’installation de votre machine !**
+
+## Annexes
+
+J'ai créé ce schéma en prenant en compte plusieurs paramètres qui me semblait importants dans la conception du réseau de machines comme la **sécurité** ou encore la **fiabilité**.
+
+[schema](schema_reseau.png)
+
