@@ -48,5 +48,5 @@ Sinon, **au prochain démarrage de votre PC**, le programme java se lancera en a
 
 J'ai créé ce schéma en prenant en compte plusieurs paramètres qui me semblait importants dans la conception du réseau de machines comme la **sécurité** ou encore la **fiabilité**.
 
-[schema](schema_reseau.png)
+![schema](schema_reseau.png)
 
